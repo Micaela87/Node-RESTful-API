@@ -25,7 +25,7 @@ user.post('/register', (req, res, next) => {
             let hashedFileName = crypto.createHash('sha256').update(img.name).digest('hex') + path.extname(img.name);
             img.mv(`./public/storage/img/${hashedFileName}`);
         } else {
-            hashedFileName = '';
+            hashedFileName = 'avatar-anonymous.png';
         }
         
         let hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
