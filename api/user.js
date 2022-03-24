@@ -46,10 +46,23 @@ user.post('/register', (req, res, next) => {
 
     } else {
 
-        if (req.files) {
+        db.get('SELECT * FROM Users WHERE email = $email', {
+            $email: email
+        }, function(err, user) {
+            if (user) {
+                res.status(412).json({ errors: 'Email già registrata' });
+            }
+
+        });
+
+        let hashedFileName = '';
+
+        if (req.files.file && req.files.file.mimetype.includes('image')) {
             let img = req.files.file;
-            let hashedFileName = crypto.createHash('sha256').update(img.name).digest('hex') + path.extname(img.name);
+            hashedFileName = crypto.createHash('sha256').update(img.name).digest('hex') + path.extname(img.name);
             img.mv(`./public/storage/img/${hashedFileName}`);
+        } else if (!req.files.file.mimetype.includes('image')) {
+            res.status(400).json({ errors: 'Formato file non valido'});
         } else {
             hashedFileName = 'avatar-anonymous.png';
         }
@@ -76,6 +89,7 @@ user.post('/register', (req, res, next) => {
             }
         });
     }
+        
 });
 
 module.exports = user;
