@@ -1,0 +1,22 @@
+{
+  "name": "restful-api",
+  "version": "1.0.0",
+  "description": "node restful api",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "author": "micaela milano",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.3.6",
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "express-fileupload": "^1.3.1",
+    "lodash": "^4.17.21",
+    "mocha": "^9.2.2",
+    "morgan": "^1.10.0",
+    "sqlite3": "^5.0.2"
+  }
+}
