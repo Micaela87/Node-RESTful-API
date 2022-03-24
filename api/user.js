@@ -28,13 +28,22 @@ user.post('/register', (req, res, next) => {
 
     let validator = new Validator(req.body, validationRules);
 
+    let errorMessages = Validator.getMessages('en');
+
+    errorMessages.required = 'Il campo :attribute è obbligatorio';
+    errorMessages.min = 'Il campo :attribute deve contenere almeno 8 caratteri';
+    errorMessages.email = 'Il campo :attribute deve contenere una email valida'; 
+    
+    Validator.setMessages('en', errorMessages);
+
     if (validator.fails()) {
         res.status(412)
             .send({
                 success: false,
-                message: 'Validation failed'
+                message: 'Validation failed',
+                data: validator.errors.all()
             });
-            
+
     } else {
 
         if (req.files) {
