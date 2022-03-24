@@ -3,6 +3,7 @@ const fileUpload = require('express-fileupload');
 const sqlite3 = require('sqlite3');
 const crypto = require('crypto');
 const path = require('path');
+const Validator = require('validatorjs');
 const user = express.Router();
 
 user.use(fileUpload({
@@ -17,8 +18,24 @@ user.post('/register', (req, res, next) => {
         lastName = req.body.lastname,
         email = req.body.email,
         password = req.body.password;
+    
+    const validationRules = {
+        'firstname': 'required|string',
+        'lastname': 'required|string',
+        'email': 'required|email',
+        'password': 'required|string|min:8'
+    }
 
-    if (firstName && lastName && email && password) {
+    let validator = new Validator(req.body, validationRules);
+
+    if (validator.fails()) {
+        res.status(412)
+            .send({
+                success: false,
+                message: 'Validation failed'
+            });
+            
+    } else {
 
         if (req.files) {
             let img = req.files.file;
@@ -50,6 +67,6 @@ user.post('/register', (req, res, next) => {
             }
         });
     }
-})
+});
 
 module.exports = user;
