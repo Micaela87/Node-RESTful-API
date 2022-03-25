@@ -61,11 +61,11 @@ user.post('/register', (req, res, next) => {
         // hashes file name and saves it in ./public/storage/img/
         let hashedFileName = '';
 
-        if (req.files.file && req.files.file.mimetype.includes('image')) {
+        if (req.files && req.files.file.mimetype.includes('image')) {
             let img = req.files.file;
             hashedFileName = hashFileName(img);
             img.mv(`./public/storage/img/${hashedFileName}`);
-        } else if (!req.files.file.mimetype.includes('image')) {
+        } else if (req.files && !req.files.file.mimetype.includes('image')) {
             res.status(412).json({ errors: 'Formato file non valido'});
         } else {
             hashedFileName = 'avatar-anonymous.png';
@@ -90,7 +90,13 @@ user.post('/register', (req, res, next) => {
                     if (err) {
                         next(err);
                     } else {
-                        res.status(201).json({newUser: newUser});
+
+                        req.session.user = {
+                            email: newUser.email,
+                            password: newUser.password
+                        }
+
+                        res.status(201).json({ newUser: newUser });
                     }
                 });  
             }
@@ -137,6 +143,12 @@ user.post('/login', (req, res, next) => {
             if (err) {
                 next(err);
             } else if (authenticatedUser) {
+                
+                req.session.user = {
+                    email: authenticatedUser.email,
+                    password: authenticatedUser.password
+                }
+
                 res.status(200).json({ authenticatedUser: authenticatedUser });
             } else {
                 res.status(404).json({ errors: 'Utente non registrato' });
