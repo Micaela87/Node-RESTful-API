@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const _ = require('lodash');
 const path = require('path');
 const sessions = require('express-session');
+const cookieParser = require('cookie-parser');
 const SQLiteStore = require('connect-sqlite3')(sessions);
 
 // express routers
