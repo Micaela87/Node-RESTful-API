@@ -1,9 +1,12 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const sqlite3 = require('sqlite3');
-const crypto = require('crypto');
-const path = require('path');
 const Validator = require('validatorjs');
+const hashingFunctions = require('./utils/hashingFunctions');
+const validations = require('./utils/validations');
+const hashFileName = hashingFunctions.hashFileName;
+const hashPassword = hashingFunctions.hashPassword;
+const setCustomValidationMessages = validations.setCustomValidationMessages;
 const user = express.Router();
 
 user.use(fileUpload({
@@ -28,13 +31,7 @@ user.post('/register', (req, res, next) => {
 
     let validator = new Validator(req.body, validationRules);
 
-    let errorMessages = Validator.getMessages('en');
-
-    errorMessages.required = 'Il campo :attribute è obbligatorio';
-    errorMessages.min = 'Il campo :attribute deve contenere almeno 8 caratteri';
-    errorMessages.email = 'Il campo :attribute deve contenere una email valida'; 
-    
-    Validator.setMessages('en', errorMessages);
+    setCustomValidationMessages();
 
     if (validator.fails()) {
         res.status(412)
@@ -59,7 +56,7 @@ user.post('/register', (req, res, next) => {
 
         if (req.files.file && req.files.file.mimetype.includes('image')) {
             let img = req.files.file;
-            hashedFileName = crypto.createHash('sha256').update(img.name).digest('hex') + path.extname(img.name);
+            hashedFileName = hashFileName(img);
             img.mv(`./public/storage/img/${hashedFileName}`);
         } else if (!req.files.file.mimetype.includes('image')) {
             res.status(400).json({ errors: 'Formato file non valido'});
@@ -67,7 +64,7 @@ user.post('/register', (req, res, next) => {
             hashedFileName = 'avatar-anonymous.png';
         }
         
-        let hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+        let hashedPassword = hashPassword(password);
 
         db.run('INSERT INTO Users (firstname, lastname, email, password, img) VALUES ($firstname, $lastname, $email, $password, $img)', {
             $firstname: firstName,
@@ -90,6 +87,46 @@ user.post('/register', (req, res, next) => {
         });
     }
         
+});
+
+user.post('/login', (req, res, next) => {
+    let email = req.body.email,
+        password = req.body.password;
+
+    let validationRules = {
+        'email': 'required|string',
+        'password': 'required|string|min:8'
+    }
+
+    let validator = new Validator(req.body, validationRules);
+
+    setCustomValidationMessages();
+
+    if (validator.fails()) {
+
+        res.status(412)
+            .send({
+                success: false,
+                message: 'Validation failed',
+                data: validator.errors.all()
+            });
+
+    } else {
+        let hashedPassword = hashPassword(password);
+
+        db.get('SELECT * FROM Users WHERE email = $email AND password = $password', {
+            $email: email,
+            $password: hashedPassword
+        }, function(err, authenticatedUser) {
+            if (err) {
+                next(err);
+            } else if (authenticatedUser) {
+                res.status(200).json({ authenticatedUser: authenticatedUser });
+            } else {
+                res.status(404).json({ errors: 'Utente non registrato' });
+            }
+        });
+    }
 });
 
 module.exports = user;
