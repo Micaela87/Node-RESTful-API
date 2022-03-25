@@ -157,4 +157,15 @@ user.post('/login', (req, res, next) => {
     }
 });
 
+user.get('/logout', (req, res, next) => {
+    if (req.session.user) {
+        delete req.session.user;
+        res.status(200)
+            .send({ 
+                success: true,
+                message: 'User logged out'
+            });
+    }
+})
+
 module.exports = user;
