@@ -7,6 +7,7 @@ const validations = require('./utils/validations');
 const hashFileName = hashingFunctions.hashFileName;
 const hashPassword = hashingFunctions.hashPassword;
 const setCustomValidationMessages = validations.setCustomValidationMessages;
+const User = require('./models/User');
 const user = express.Router();
 
 // uploads files in existing directory
@@ -106,7 +107,7 @@ user.post('/register', (req, res, next) => {
 });
 
 // logs in user
-user.post('/login', (req, res, next) => {
+user.post('/login', async function (req, res, next) {
     let email = req.body.email,
         password = req.body.password;
 
@@ -166,6 +167,21 @@ user.get('/logout', (req, res, next) => {
                 message: 'User logged out'
             });
     }
+});
+
+user.get('/', async function(req, res, next) {
+    try {
+
+        const allUsers = await User.findAll();
+
+        if (allUsers) {
+            res.status(200).json({ allUsers });
+        }
+
+    } catch(err) {
+        console.log(err);
+    }
+
 })
 
 module.exports = user;

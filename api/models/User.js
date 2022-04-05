@@ -2,8 +2,11 @@ const { Sequelize, DataTypes, Model } = require('sequelize');
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: '../../database.sqlite'
+    storage: 'database.sqlite',
+    database: 'database.sqlite'
 });
+
+console.log(sequelize);
 
 class User extends Model { };
 
@@ -13,11 +16,11 @@ User.init({
         autoIncrement: true,
         primaryKey: true
     },
-    firstName: {
+    firstname: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    lastName: {
+    lastname: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -36,5 +39,9 @@ User.init({
 }, {
     sequelize,
     timestamps: false,
-    modelName: 'User'
+    modelName: 'User',
+    tableName: 'Users'
 });
+
+
+module.exports = User;
