@@ -6,8 +6,6 @@ const sequelize = new Sequelize({
     database: 'database.sqlite'
 });
 
-console.log(sequelize);
-
 class User extends Model { };
 
 User.init({
