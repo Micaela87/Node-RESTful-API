@@ -1,4 +1,5 @@
 const Validator = require('validatorjs');
+const User = require('../models/User');
 
 const setCustomValidationMessages = () => {
     let errorMessages = Validator.getMessages('en');
@@ -10,6 +11,26 @@ const setCustomValidationMessages = () => {
     Validator.setMessages('en', errorMessages);
 }
 
-module.exports = { setCustomValidationMessages };
+const checkIfUserAlreadyExists = async (email) => {
+    try {
+        const user = await User.findAll({
+            where: {
+                email
+            }
+        });
+    
+        if (user.length > 0) {
+            return true;
+        }
+    
+        return false;
+
+    } catch(err) {
+        console.log(err);
+    }
+
+}
+
+module.exports = { setCustomValidationMessages, checkIfUserAlreadyExists };
 
 
