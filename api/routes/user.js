@@ -2,9 +2,9 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 const sqlite3 = require('sqlite3');
 const Validator = require('validatorjs');
-const { hashFileName, hashPassword } = require('./utils/hashingFunctions');
-const { setCustomValidationMessages, checkIfUserAlreadyExists } = require('./utils/validations');
-const User = require('./models/User');
+const { hashFileName, hashPassword } = require('../utils/hashingFunctions');
+const { setCustomValidationMessages, checkIfUserAlreadyExists } = require('../utils/validations');
+const User = require('../models/User');
 const user = express.Router();
 
 // uploads files in existing directory
@@ -154,10 +154,10 @@ user.get('/logout', (req, res, next) => {
     if (req.session.user) {
         delete req.session.user;
         res.status(200)
-            .send({ 
-                success: true,
-                message: 'User logged out'
-            });
+        .send({ 
+            success: true,
+            message: 'User logged out'
+        });
     }
 });
 

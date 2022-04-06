@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 const SQLiteStore = require('connect-sqlite3')(sessions);
 
 // express routers
-const user = require('./api/user.js');
+const user = require('./api/routes/user.js');
 
 const app = express();
 
@@ -48,3 +48,5 @@ const port = process.env.PORT || 4001;
 app.listen(port, function() {
     console.log('Server listening on port ' + port);
 });
+
+module.exports = app;
