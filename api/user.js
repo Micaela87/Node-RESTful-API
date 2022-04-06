@@ -84,6 +84,12 @@ user.post('/register', async (req, res, next) => {
         });
 
         if (newUser) {
+
+            req.session.user = {
+                email: newUser.email,
+                password: newUser.password
+            }
+            
             return res.status(201).json({ newUser });
         }
 
