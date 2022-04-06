@@ -2,8 +2,6 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 const sqlite3 = require('sqlite3');
 const Validator = require('validatorjs');
-const hashingFunctions = require('./utils/hashingFunctions');
-const validations = require('./utils/validations');
 const { hashFileName, hashPassword } = require('./utils/hashingFunctions');
 const { setCustomValidationMessages, checkIfUserAlreadyExists } = require('./utils/validations');
 const User = require('./models/User');
@@ -13,8 +11,6 @@ const user = express.Router();
 user.use(fileUpload({
     createParentPath: false
 }));
-
-const db = new sqlite3.Database('database.sqlite');
 
 // registers new user
 user.post('/register', async (req, res, next) => {
@@ -95,6 +91,7 @@ user.post('/register', async (req, res, next) => {
 
     } catch(err) {
         next(err);
+        return res.status(500).send('Ooops! Something broke!');
     }    
         
 });
@@ -150,6 +147,7 @@ user.post('/login', async (req, res, next) => {
 
     } catch(err) {
         next(err);
+        return res.status(500).send('Ooops! Something broke!');
     }
     
 });
@@ -165,17 +163,18 @@ user.get('/logout', (req, res, next) => {
     }
 });
 
-user.get('/', async function(req, res, next) {
+user.get('/', async (req, res, next) => {
     try {
 
         const allUsers = await User.findAll();
 
         if (allUsers) {
-            res.status(200).json({ allUsers });
+            return res.status(200).json({ allUsers });
         }
 
     } catch(err) {
-        console.log(err);
+        next(err);
+        return res.status(500).send('Ooops! Something broke!');
     }
 
 })
