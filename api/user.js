@@ -89,19 +89,18 @@ user.post('/register', async (req, res, next) => {
                 email: newUser.email,
                 password: newUser.password
             }
-            
+
             return res.status(201).json({ newUser });
         }
 
     } catch(err) {
-        console.log(err);
         next(err);
     }    
         
 });
 
 // logs in user
-user.post('/login', async function (req, res, next) {
+user.post('/login', async (req, res, next) => {
     let email = req.body.email,
         password = req.body.password;
 
@@ -119,37 +118,40 @@ user.post('/login', async function (req, res, next) {
     // sends validation errors back if validation fails
     if (validator.fails()) {
 
-        res.status(412)
-            .send({
-                success: false,
-                message: 'Validation failed',
-                data: validator.errors.all()
-            });
+        return res.status(412)
+        .send({
+            success: false,
+            message: 'Validation failed',
+            data: validator.errors.all()
+        });
 
-    } else {
-        // hashes password
-        let hashedPassword = hashPassword(password);
+    }
+    
+    try {
 
-        // searches for user in the db and sends back a response according to the results
-        db.get('SELECT * FROM Users WHERE email = $email AND password = $password', {
-            $email: email,
-            $password: hashedPassword
-        }, function(err, authenticatedUser) {
-            if (err) {
-                next(err);
-            } else if (authenticatedUser) {
-                
-                req.session.user = {
-                    email: authenticatedUser.email,
-                    password: authenticatedUser.password
-                }
-
-                res.status(200).json({ authenticatedUser: authenticatedUser });
-            } else {
-                res.status(404).json({ errors: 'Utente non registrato' });
+        const authenticatedUser = await User.findOne({
+            where: {
+                email,
+                password: hashPassword(password)
             }
         });
+    
+        if (authenticatedUser) {
+    
+            req.session.user = {
+                email: authenticatedUser.email,
+                password: authenticatedUser.password
+            }
+    
+            return res.status(200).json({ authenticatedUser });
+        }
+
+        return res.status(404).send({ error: 'Credenziali non valide o utente non registrato' });
+
+    } catch(err) {
+        next(err);
     }
+    
 });
 
 user.get('/logout', (req, res, next) => {
