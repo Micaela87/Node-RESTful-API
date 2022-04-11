@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" content={{ csrfToken }}>
     <title>Document</title>
 </head>
 <body>
     <h2>Registration Form</h2>
     <form action="api/user/register" method="POST" enctype="multipart/form-data">
+        <input type='hidden' name='_csrf' value="{{ csrfToken }}" />
         <label for="firstname">First Name</label><br>
         <input type="text" name="firstname"><br>
         <label for="lastname">Last Name</label><br>
@@ -19,15 +21,16 @@
         <input type="text" name="password"><br>
         <label for="file">Profile Picture</label><br>
         <input type="file" name="file" id="">
-        <input type="submit" value="Submit">
+        <input id="register-btn" type="submit" value="Submit">
     </form>
     <h2>Login Form</h2>
     <form action="api/user/login" method="POST">
+        <input type='hidden' name='_csrf' value={{ csrfToken }} />
         <label for="email">Email</label><br>
-        <input type="text" name="email"><br>
+        <input type="text" name="email" id="login-email"><br>
         <label for="password">Password</label><br>
-        <input type="text" name="password"><br>
-        <input type="submit" value="Submit">
+        <input type="text" name="password" id="login-pwd"><br>
+        <input id="login-btn" type="submit" value="Submit">
     </form>
     <button id="logout">Logout</button>
     <script src="./src/js/index.js" type="application/javascript"></script>
