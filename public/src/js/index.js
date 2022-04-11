@@ -5,9 +5,11 @@ logoutBtn.addEventListener('click', async function() {
 
         let response = await fetch('http://localhost:4001/api/user/logout');
 
-        console.log(response);
+        if (!response.ok) {
+            throw new Error('Ooops! Something went wrong!')
+        }
 
     } catch(err) {
         console.log(err);
     }
-})
+});
