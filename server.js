@@ -7,6 +7,7 @@ const sessions = require('express-session');
 const cookieParser = require('cookie-parser');
 const csurf = require('csurf');
 const hbs = require('hbs');
+const helmet = require('helmet');
 const SQLiteStore = require('connect-sqlite3')(sessions);
 
 // express routers
@@ -43,7 +44,11 @@ app.use(sessions({
     store: new SQLiteStore,
     secret: "keyboard cat",
     saveUninitialized: true,
-    cookie: { maxAge: oneDay },
+    cookie: { 
+        maxAge: oneDay,
+        httpOnly: true,
+        secure: true
+    },
     resave: false 
 }));
 
@@ -51,6 +56,8 @@ app.use(sessions({
 app.use(cookieParser());
 
 app.use(csrfMiddleware);
+
+app.use(helmet());
 
 app.use('/api/user', user);
 
